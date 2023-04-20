@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./assets/css/main.css">
+    <link rel="stylesheet" href="./assets/fontawesome-free-6.3.0-web/css/all.css">
+</head>
+<body>
+    <div style="box-shadow: 0 0 20px 4px #000; width: 300px; margin:auto">
+        <div class="player">
+            <div class="controller">
+                <p class="now-play">
+                    Now playing:
+                </p>
+                <h3 class="song-name non-margin">4:00 AM</h3>
+                <div class="CD">
+                    <div class="CD-img"></div>
+                </div>
+                <div class="audio-section">
+                    <audio>
+                        <source src="./assets/songs/audio/1 - Taeko Ohnuki  400 AM  1978.mp3">   
+                    </audio>
+                </div>
+                <div class="song-btn">
+                    <div onclick="app.repeatAudio('no-repeat')" class="repeat-btn">
+                        <i class="repeat-icon fa-solid fa-repeat"></i>
+                    </div>
+                    <div onclick="app.preAudio()" class="prev-btn">
+                        <i class="prev-icon fa-solid fa-backward-step"></i>
+                    </div>
+                    <div onclick="app.playAudio()" class="play-btn">
+                        <i class="play-icon fa-solid fa-circle-play"></i>
+                    </div>
+                    <div onclick="app.nextAudio()" class="next-btn">
+                        <i class="next-icon fa-solid fa-forward-step"></i>
+                    </div>
+                    <div onclick="app.randomSongBtn(false)" class="random-song-btn">
+                        <i class="random-icon fa-solid fa-shuffle"></i>
+                    </div>
+                </div>
+                <input class="time-bar" type="range" value="0" step="1" min="0" max="100">
+            </div>
+        </div>
+    
+        <div class="playlist"></div>
+    </div>
+    <script>
+        let onRandomBtn = false
+        let song_id = 0
+        const $ = document.querySelector.bind(document)
+        const $$ = document.querySelectorAll.bind(document)
+        
+        const app = {
+            songs: [
+                {   
+                    id: 0,
+                    name: '4:00 AM',
+                    present: 'Taeko Ohnuki',
+                    img_link:'./assets/songs/thumbnail/1.jpg',
+                    song_link: './assets/songs/audio/1 - Taeko Ohnuki  400 AM  1978.mp3',
+                },
+                {
+                    id: 1,
+                    name: 'Fantasy',
+                    present: 'Meiko Nakahara',
+                    img_link:'./assets/songs/thumbnail/2.jpg',
+                    song_link: './assets/songs/audio/2 - Meiko Nakahara  Fantasy 1982 (1).mp3'
+                },
+                {
+                    id: 2,
+                    name: 'Bay City',
+                    present: 'Junko Yagami',
+                    img_link:'./assets/songs/thumbnail/3.jpg',
+                    song_link: './assets/songs/audio/3 - 黄昏のBay City.mp3'
+                },
+                {
+                    id: 3,
+                    name: 'Sunset Road',
+                    present: 'Reiko Takahashi',
+                    img_link:'./assets/songs/thumbnail/4.jpg',
+                    song_link: './assets/songs/audio/4 - Reiko Takahashi  Sunset Road  September Blue.mp3'
+                },
+                {
+                    id: 4,
+                    name: 'Angel Touch',
+                    present: 'CINDY',
+                    img_link:'./assets/songs/thumbnail/5.jpg',
+                    song_link: './assets/songs/audio/5 - CINDY  Angel Touch 1990  Track 7  私達を信じていて (1).mp3'
+                },
+                {
+                    id: 5,
+                    name: 'Plastic Love',
+                    present: 'Mariya Takeuchi',
+                    img_link:'./assets/songs/thumbnail/6.jpg',
+                    song_link: './assets/songs/audio/6 - Mariya Takeuchi  Plastic Love 竹内 まりや.mp3'
+                },
+                {
+                    id: 6,
+                    name: 'Stay With Me',
+                    present: 'Miki Matsubara',
+                    img_link:'./assets/songs/thumbnail/7.jpg',
+                    song_link: './assets/songs/audio/7 - Stay With Me  Miki Matsubara Lyrics Vietsub.mp3'
+                },
+                {
+                    id: 7,
+                    name: 'Cái jz ta?',
+                    present: 'Dudu',
+                    img_link:'./assets/songs/thumbnail/8.jpg',
+                    song_link: './assets/songs/audio/8 - Santa Clause đang lao tới tầng hầm  Santa Clause is coming to town VN ver  Hibiki Du Ca.mp3'
+                },
+                {
+                    id: 8,
+                    name: 'Tình Ca Tây Bắc',
+                    present: 'Bích Liên - Kiều Hùng',
+                    img_link:'./assets/songs/thumbnail/9.jpg',
+                    song_link: './assets/songs/audio/9 - Tình Ca Tây Bắc  Bích Liên  Kiều Hưng Thu thanh trước 1975  Hợp Tác Xã.mp3'
+                },
+                {
+                    id: 9,
+                    name: 'Final Duet',
+                    present: 'Omori',
+                    img_link:'./assets/songs/thumbnail/10.jpg',
+                    song_link: './assets/songs/audio/10 - OMORI  Final Duet.mp3'
+                },
+            ],
+
+            render: function() {
+                const htmls = this.songs.map((song) => {
+                    return `
+                    <div onclick="app.selectSong(${song.id},'${song.name}', '${song.img_link}', '${song.song_link}')" class="song-box ${song_id === song.id ? "active" : ""}" data-id="${song.id}">
+                        <div style="background-image: url(${song.img_link})" class="song-box-img"></div>
+                        <div class="song-infor">
+                            <h4 class="song-name non-margin">${song.name}</h4>
+                            <p class="presentBy non-margin">${song.present}</p>
+                        </div>
+                        <div class="more-btn">
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </div>
+                    </div>
+                    `
+                })
+                $('.playlist').innerHTML = htmls.join('')
+            },
+
+            selectSong: function(id, name, img_link, song_link) {
+                const songName = $('.player .song-name')
+                const playerImg = $('.player .CD-img')
+                const audioLink = $('.audio-section audio')
+                
+                songName.innerText = name
+                playerImg.style.backgroundImage = `url(${img_link})`
+                audioLink.src = `${song_link}`
+                app.playAudio()
+                song_id = id
+                app.render()
+            },
+
+            playAudio: function() {
+                const CD = $('.CD')
+                const playBtn = $('.play-btn')
+                const currAudio = $('.audio-section audio')
+                
+                CD.style.animationPlayState = 'running'
+                currAudio.play()
+
+                const htmls = `
+                    <div onclick="app.pauseAudio()" class="play-btn">
+                        <i class="fa-solid fa-circle-pause"></i>
+                    </div>
+                    `
+                playBtn.outerHTML = htmls
+            },
+
+            pauseAudio: function() {
+                const CD = $('.CD')
+                const playBtn = $('.play-btn')
+                const currAudio = $('.audio-section audio')
+
+                currAudio.pause()
+                CD.style.animationPlayState = 'paused'
+
+                const htmls = `
+                    <div onclick="app.playAudio()" class="play-btn">
+                        <i class="fa-solid fa-circle-play"></i>
+                    </div>
+                `
+                playBtn.outerHTML = htmls
+            },
+
+            repeatAudio: function(state) {
+                const currAudio = $('.audio-section audio')
+                const repeatBtn = $('.repeat-btn')
+                if(state === 'no-repeat') {
+                    currAudio.loop = true
+                    repeatBtn.outerHTML = `
+                        <div onclick="app.repeatAudio('repeat')" class="repeat-btn">
+                            <i style="color: rgb(212, 12, 72)" class="repeat-icon fa-solid fa-repeat"></i>
+                        </div>
+                    `
+                } else {
+                        currAudio.loop = false
+                        repeatBtn.outerHTML = `
+                            <div onclick="app.repeatAudio('no-repeat')" class="repeat-btn">
+                                <i class="repeat-icon fa-solid fa-repeat"></i>
+                            </div>
+                            `
+                        }
+                },
+                
+                nextAudio: function() {
+                    const songName = $('.player .song-name')
+                    const playerImg = $('.player .CD-img')
+                    const audioLink = $('.audio-section audio')
+                    
+                    if(song_id == this.songs.length - 1) {
+                        song_id = -1
+                    }
+                    const currAudio = this.songs.find(song => {
+                        return song.id == song_id + 1 
+                    }) 
+            
+                    songName.innerText = currAudio.name
+                    playerImg.style.backgroundImage = `url(${currAudio.img_link})`
+                    audioLink.src = `${currAudio.song_link}`
+                    app.playAudio()
+                    song_id = currAudio.id
+                    app.render()
+                },
+
+                preAudio: function() {
+                    const songName = $('.player .song-name')
+                    const playerImg = $('.player .CD-img')
+                    const audioLink = $('.audio-section audio')
+                    
+                    if(song_id == 0) {
+                        song_id = 10
+                    }
+                    const currAudio = this.songs.find(song => {
+                        return song.id == song_id - 1 
+                    }) 
+            
+                    songName.innerText = currAudio.name
+                    playerImg.style.backgroundImage = `url(${currAudio.img_link})`
+                    audioLink.src = `${currAudio.song_link}`
+                    app.playAudio()
+                    song_id = currAudio.id
+                    app.render()
+                },
+
+                changeCDSize: function() {
+                    const CD = $('.CD')
+                    let position
+                    const CDWidth = CD.offsetWidth
+                    document.onscroll = (e) => {
+                        position = window.scrollY || document.documentElement.scrollTop
+                        newWidth = CDWidth - position
+                        CD.style.width = newWidth > 0 ? newWidth + 'px' : '0px'
+                    }
+                },
+
+                randomSongBtn: function(boolean) {
+                    let prevBtn = $('.prev-btn')
+                    let nextBtn = $('.next-btn')
+                    let randomSongBtn = $('.random-song-btn')
+                    if(boolean) {
+                        onRandomBtn = false
+                        randomSongBtn.outerHTML = `
+                            <div onclick="app.randomSongBtn(false)" class="random-song-btn">
+                                <i class="random-icon fa-solid fa-shuffle"></i>
+                            </div>
+                        `
+                        prevBtn.outerHTML = `
+                            <div onclick="app.preAudio()" class="prev-btn">
+                                <i class="prev-icon fa-solid fa-backward-step"></i>
+                            </div>
+                            `
+                            
+                        nextBtn.outerHTML = `
+                            <div onclick="app.nextAudio()" class="next-btn">
+                                <i class="next-icon fa-solid fa-forward-step"></i>
+                            </div>
+                            `
+
+                    } else {
+                        onRandomBtn = true
+                        randomSongBtn.outerHTML = `
+                            <div style="color: rgb(212, 12, 72)" onclick="app.randomSongBtn(true)" class="random-song-btn">
+                                <i class="random-icon fa-solid fa-shuffle"></i>
+                            </div>
+                        `
+                        prevBtn.outerHTML = `
+                            <div onclick="app.getRandomSong()" class="prev-btn">
+                                <i class="prev-icon fa-solid fa-backward-step"></i>
+                            </div>
+                            `
+                            
+                        nextBtn.outerHTML = `
+                            <div onclick="app.getRandomSong()" class="next-btn">
+                                <i class="next-icon fa-solid fa-forward-step"></i>
+                            </div>
+                            `
+                    }
+                },
+
+                getRandomSong: function() {
+                    const songName = $('.player .song-name')
+                    const playerImg = $('.player .CD-img')
+                    const audioLink = $('.audio-section audio')
+
+                    let random
+                    do {
+                            random = Math.floor(Math.random() * app.songs.length)
+                        } while(random == song_id)
+                    
+                    const currAudio = app.songs[random]
+                    songName.innerText = currAudio.name
+                    playerImg.style.backgroundImage = `url(${currAudio.img_link})`
+                    audioLink.src = `${currAudio.song_link}`
+                    app.playAudio()
+                    song_id = currAudio.id
+                    app.render()
+                },
+
+                timeBar: function() {
+                    const timeBar = $('.time-bar')
+                    const audio = $('audio')
+                    audio.ontimeupdate = e => {
+                        
+                        timeBar.value = Math.floor((audio.currentTime/audio.duration)*100)
+
+                        if(audio.ended && onRandomBtn) 
+                            app.getRandomSong()
+
+                        else if(audio.ended && !audio.loop) {
+                            app.nextAudio()
+                        }
+                    }
+                
+                    timeBar.oninput = e => {
+                        audio.currentTime = timeBar.value * audio.duration / 100
+                    }
+
+                },
+
+                // colorSongBox: function() {
+                //     const myBox = $(`[data-id = "0"]`)
+                //     console.log(myBox)
+                // },
+
+                scrollCurrentSongBox: function() {
+                    const currAudio = $('audio')
+                    currAudio.ondurationchange = e => {
+                        const songBox = $('.song-box.active')
+                        songBox.scrollIntoView({behavior: "smooth",block: "nearest"})
+                    }
+                },
+
+                start: function() {
+                    this.render()
+                    this.changeCDSize()
+                    this.timeBar()
+                    this.scrollCurrentSongBox()
+            }
+        }
+        app.start()
+    </script>
+</body>
+</html>
+
+<!-- Sử dụng toán tử ++ trong method của object làm kết quả của biến sử dụng toán từ ấy bị sai lệch -->
+<!-- Tìm hiểu về localStorage -->
